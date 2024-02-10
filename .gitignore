@@ -164,3 +164,7 @@ cython_debug/
 # Custom Added
 .DS_Store
 frames/
+comic_assortment/
+smart_crop_frames/
+frames_old/
+*.zip
