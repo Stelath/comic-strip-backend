@@ -1,0 +1,7 @@
+Given the following outline of a comic book story, come up with a fun title.
+
+$OUTLINE
+
+The title must be one line
+Your output must be in the format:
+Title: [title]

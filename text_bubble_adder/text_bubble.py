@@ -1,8 +1,10 @@
 from PIL import Image, ImageDraw, ImageFont
-from clipseg import get_location
+from .clipseg import get_location
 from story_components.character import CharacterMoment, Character
+import math
 
 MAX_TEXT_WIDTH = 200
+MAX_HEIGHT = 40
 
 
 def pick_relative_location(image: Image, head_location, t_width, t_height):
@@ -27,15 +29,15 @@ def pick_relative_location(image: Image, head_location, t_width, t_height):
 
     # If the head is on the left side of the image, the text bubble will be on the right side
     if head_x < image_width / 2:
-        x = head_x + 20
+        x = head_x + 60
     # If the head is on the right side of the image, the text bubble will be on the left side
     else:
-        x = head_x - 20 - t_width
+        x = head_x - 60 - t_width
 
     # Placing the bubble above the head
     # If the bubble would go off the top of the image, place it as high as possible
-    y = head_y - 20 - t_height
-    if y < 0:
+    y = head_y - 60 - t_height
+    if y < MAX_HEIGHT:
         y = 0
 
     return x, y
@@ -100,7 +102,7 @@ def find_head_edge(image: Image, head_location, logits):
     check_y = head_y
     while 0 <= check_x < image_width and 0 <= check_y < image_height:
         check_logit = logits[int(check_y)][int(check_x)]
-        if check_logit < head_logit - 1:
+        if check_logit < head_logit - abs(head_logit * 0.1):
             break
         check_x += direction * 2
         check_y -= 0.1
@@ -109,7 +111,7 @@ def find_head_edge(image: Image, head_location, logits):
 
 
 class TextBubble:
-    def __init__(self, loc, width, height, point_to_loc, text):
+    def __init__(self, loc, width, height, point_to_loc, text, head_loc):
         """
         Holds all the values associated with a text bubble
         :param loc: The top left corner of the ellipse (x,y)
@@ -119,16 +121,35 @@ class TextBubble:
         :param text: The text to be displayed in the bubble
         """
 
+        self.head_loc = head_loc
         self.loc = loc
         self.width = width
         self.height = height
-        self.point_to_loc = point_to_loc
+        self.point_to_loc = point_to_loc  # Head edge
         self.text = text
+
+    def get_off_of_point_to_loc(self):
+        """
+        If point to loc is within the bubble or near being within the bubble, move the bubble away from it
+        """
+        pad = 30
+
+        while self.loc[1] - pad < self.point_to_loc[1] < self.loc[1] + self.height + pad:
+            angle = math.atan2(self.point_to_loc[1] - self.loc[1], self.point_to_loc[0] - self.loc[0])
+            self.loc = (self.loc[0] - math.cos(angle) * 10, self.loc[1] - 40 * math.sin(angle))
+            if math.sin(angle) == 0:
+                self.loc = (self.loc[0], self.loc[1] + 40)
 
 
 def add_text_bubbles(image: Image, character_moments: list[CharacterMoment]):
+    """
+    Adds text bubbles to an image
+    :param image: PIL Image that the text bubbles will be added to
+    :param character_moments: A list of CharacterMoments in the frame
+    :return: A PIL Image with text bubbles
+    """
     font_size = 30
-    font = ImageFont.truetype("textbubblefont.ttf", font_size)
+    font = ImageFont.truetype("text_bubble_adder/textbubblefont.ttf", font_size)
 
     """
     Getting a bubble for each character in the frame
@@ -136,7 +157,7 @@ def add_text_bubbles(image: Image, character_moments: list[CharacterMoment]):
 
     text_bubbles = []
     for character_moment in character_moments:
-        physical_description = character_moment.physical_description + " head"
+        physical_description = character_moment.physical_description
         dialogue = character_moment.dialogue
 
         # Wrap the text
@@ -153,7 +174,12 @@ def add_text_bubbles(image: Image, character_moments: list[CharacterMoment]):
         head_edge = find_head_edge(image, head_location, logits)
         bubble_top_left = pick_relative_location(image, head_location, bubble_width, bubble_height)
 
-        text_bubbles.append(TextBubble(bubble_top_left, bubble_width, bubble_height, head_edge, dialogue))
+        # Moving the bubble up or down from the head_edge if they have a similar y value
+        if abs(bubble_top_left[1] - head_edge[1]) < 10:
+            bubble_top_left = (bubble_top_left[0], head_edge[1] - bubble_height - 20)
+
+        text_bubbles.append(
+            TextBubble(bubble_top_left, bubble_width, bubble_height, head_edge, dialogue, head_location))
 
     """
     Deconflicting bubbles that may overlap or cross each other with their triangles
@@ -165,8 +191,11 @@ def add_text_bubbles(image: Image, character_moments: list[CharacterMoment]):
                     text_bubbles[i].loc[1] < text_bubbles[j].loc[1] + text_bubbles[j].height and \
                     text_bubbles[i].loc[1] + text_bubbles[i].height > text_bubbles[j].loc[1]:
                 # If the bubbles overlap, move the second bubble down
-                text_bubbles[j].loc = (text_bubbles[j].loc[0], text_bubbles[i].loc[1] + text_bubbles[i].height + 20)
-                text_bubbles[j].point_to_loc = (text_bubbles[j].point_to_loc[0], text_bubbles[i].point_to_loc[1] + text_bubbles[i].height + 20)
+                print("DECONFLICTING")
+                text_bubbles[j].loc = (text_bubbles[j].loc[0], text_bubbles[i].loc[1] + text_bubbles[i].height + 80)
+
+    # for text_bubble in text_bubbles:
+    #     text_bubble.get_off_of_point_to_loc()
 
     """
     Drawing the bubbles and triangles
@@ -175,25 +204,47 @@ def add_text_bubbles(image: Image, character_moments: list[CharacterMoment]):
 
     for text_bubble in text_bubbles:
         # Define the location and size of the text bubble
-        bubble_location = [text_bubble.loc[0], text_bubble.loc[1], text_bubble.loc[0] + text_bubble.width, text_bubble.loc[1] + text_bubble.height]
+        bubble_location = [text_bubble.loc[0], text_bubble.loc[1], text_bubble.loc[0] + text_bubble.width,
+                           text_bubble.loc[1] + text_bubble.height]
 
         # Draw a triangle from the head edge to the text bubble
-        head_x = text_bubble.point_to_loc[0]
-        head_y = text_bubble.point_to_loc[1]
-        draw.polygon([head_x, head_y, text_bubble.loc[0], text_bubble.loc[1] + text_bubble.height / 2, text_bubble.loc[0] + text_bubble.width, text_bubble.loc[1] + text_bubble.height / 2], fill='white', outline='black')
+        head_edge_x = text_bubble.point_to_loc[0]
+        head_edge_y = text_bubble.point_to_loc[1]
+        draw.polygon([head_edge_x, head_edge_y, text_bubble.loc[0], text_bubble.loc[1] + text_bubble.height / 2,
+                      text_bubble.loc[0] + text_bubble.width, text_bubble.loc[1] + text_bubble.height / 2],
+                     fill='white', outline='black')
 
         # Draw the text bubble
         draw.ellipse(bubble_location, fill='white', outline='black')
 
-        text_top_left = (text_bubble.loc[0] + (text_bubble.width - text_width) / 2, text_bubble.loc[1] + (text_bubble.height - text_height) / 2)
+        text_top_left = (text_bubble.loc[0] + (text_bubble.width - text_width) / 2,
+                         text_bubble.loc[1] + (text_bubble.height - text_height) / 2)
 
         # Add the text to the bubble
         draw.text(text_top_left, text_bubble.text, fill='black', font=font)
 
+        # Debug drawing
+        # draw = ImageDraw.Draw(image)
+        # draw.ellipse([head_edge_x - 5, head_edge_y - 5, head_edge_x + 5, head_edge_y + 5],
+        #              fill='blue', outline='blue')
+        # draw.ellipse([text_bubble.head_loc[0] - 5, text_bubble.head_loc[1] - 5, text_bubble.head_loc[0] + 5,
+        #               text_bubble.head_loc[1] + 5], fill='red',
+        #              outline='red')
+        # draw.line([text_bubble.point_to_loc[0], text_bubble.point_to_loc[1], text_bubble.loc[0], text_bubble.loc[1]],
+        #           fill='black')
+
     return image
 
 
-# Usage
-dialogue = "Hello there! I'm John. I love to walk around and talk to people. I'm a very friendly person. I also like trees!"
-my_character = CharacterMoment(Character("John", "A dark haired man", "None"), "walks", dialogue)
-add_text_bubbles(Image.open("dark-haired-man.jpg"), [my_character])
+
+if __name__ == "__main__":
+    # Example usage
+
+    guardian = CharacterMoment(Character("Guardian",
+                                         "Tall and muscular, with a strong and chiseled jawline. Shiny silver armor with a glowing emblem on the chest.",
+                                         "Brave and selfless"), "punches", "You're going down, villain!")
+    shadow = CharacterMoment(Character("Shadow", "Wearing green",
+                                       "Cunning and mysterious"), "dodges", "You can't catch me, Guardian!")
+    output = add_text_bubbles(Image.open("twoguys.jpg"), [guardian, shadow])
+    # Save the image
+    output.save("output1.jpg")

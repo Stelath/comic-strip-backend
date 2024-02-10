@@ -22,6 +22,7 @@ class ComicBookPrompter:
         self.openai = OpenAI(api_key=self.key)
 
         self.outline = self.gen_outline()
+        self.title = self.gen_title()
         self.characters = self.gen_characters()
         self.frames = self.gen_frames()
         self.frame_diffusion_prompts = self.get_diffusion_prompts_for_frames()
@@ -54,6 +55,25 @@ class ComicBookPrompter:
         with open("outline_output.txt", "w") as file:
             file.write(output)
         return output
+
+    def gen_title(self):
+        # Given the outline, generate a title
+        with open('story_generator/prompts/gen_title_prompt.txt', 'r') as file:
+            prompt = file.read()
+
+        prompt = prompt.replace("$OUTLINE", self.outline)
+        messages = [
+            {"role": "system", "content": "You are a good title maker for comic book stories"},
+            {"role": "user", "content": prompt}
+        ]
+        output = self.ask_chat_gpt(messages)
+        with open("title_output.txt", "w") as file:
+            file.write(output)
+
+        for line in output.split("\n"):
+            if "Title:" in line:
+                return line[7:]
+
 
     def gen_characters(self):
         """
@@ -221,7 +241,7 @@ class ComicBookPrompter:
 
             messages = [
                 {"role": "system", "content": "You are a good diffusion model prompter engineer that is concise\n"
-                                              "Always use physical descriptions including gender\n"},
+                                              "Always use physical descriptions including gender and race\n"},
                 {"role": "user", "content": to_prompt}
             ]
             output = self.ask_chat_gpt(messages)
@@ -230,6 +250,7 @@ class ComicBookPrompter:
 
     def __str__(self):
         out = ""
+        out += "Title: " + self.title + "\n"
         out += "Outline: " + self.outline + "\n"
         out += "\nCharacters: \n"
         for character in self.characters:
