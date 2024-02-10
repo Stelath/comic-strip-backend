@@ -5,7 +5,8 @@ import Levenshtein
 
 import copy
 import random
-
+import logging
+from multiprocessing import Pool
 
 class ComicBookPrompter:
     def __init__(self, user_prompt):
@@ -19,13 +20,39 @@ class ComicBookPrompter:
             print("Error: chatgpt_key.txt not found")
             exit(1)
 
-        self.openai = OpenAI(api_key=self.key)
+        self.logging = logging.getLogger(__name__)
+        self.logging.setLevel(logging.DEBUG)
+        self.logging.addHandler(logging.StreamHandler())
 
+        self.logging.info("Initializing OpenAI")
+
+        self.openai = OpenAI(api_key=self.key)
+        self.logging.info("Getting outline...")
         self.outline = self.gen_outline()
+
+        self.logging.info("Getting title...")
         self.title = self.gen_title()
-        self.characters = self.gen_characters()
+
+        self.logging.info("Getting characters...")
+
+        done = False
+        while not done:
+            try:
+                self.characters = self.gen_characters()
+                done = True
+            except ValueError as e:
+                self.logging.error(e)
+                self.logging.error("Retrying to get characters...")
+
+        self.logging.info(f"Got {len(self.characters)} characters")
+
+        self.logging.info("Getting frames...")
         self.frames = self.gen_frames()
+        self.logging.info(f"Got {len(self.frames)} frames")
+
+        self.logging.info("Getting diffusion prompts...")
         self.frame_diffusion_prompts = self.get_diffusion_prompts_for_frames()
+        self.logging.info(f"Got {len(self.frame_diffusion_prompts)} diffusion prompts")
 
     def ask_chat_gpt(self, messages):
         """
@@ -34,7 +61,7 @@ class ComicBookPrompter:
         :return: The response from the ChatGPT
         """
         response = self.openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4-turbo-preview",
             messages=messages
         )
         return response.choices[0].message.content
@@ -74,7 +101,6 @@ class ComicBookPrompter:
             if "Title:" in line:
                 return line[7:]
 
-
     def gen_characters(self):
         """
         Given the outline, generate characters
@@ -82,7 +108,7 @@ class ComicBookPrompter:
         Returns: list of Character objects
         """
 
-        num_characters = random.randint(1, 4)
+        num_characters = random.randint(2, 4)
 
         # Load get characters prompt from file
         with open('story_generator/prompts/get_characters_prompt.txt', 'r') as file:
@@ -120,12 +146,19 @@ class ComicBookPrompter:
                     physical_description = line[10:]
                 elif "Personality:" in line:
                     personality = line[13:]
+                elif "Gender:" in line:
+                    physical_description = line[8:] + " " + physical_description
+                elif "Race:" in line:
+                    physical_description = line[6:] + " " + physical_description
 
             if name and physical_description and personality:
                 characters.append(Character(name, physical_description, personality))
             else:
                 print("Error: failed to parse character\n",
                       "Info:", character_text_section)
+
+        if len(characters) < 2:
+            raise ValueError("Error: failed to generate enough characters")
 
         return characters
 
@@ -135,7 +168,7 @@ class ComicBookPrompter:
 
         Provides ChatGPT with the general outline and characters, and asks for 4 to 6 frames for the comic book
         """
-        num_frames = random.randint(4, 6)
+        num_frames = random.randint(10, 20)
         prompt = None
         with open('story_generator/prompts/get_frames_prompt.txt', 'r') as file:
             prompt = file.read()
@@ -171,6 +204,11 @@ class ComicBookPrompter:
             for i, line in enumerate(frame_text_section_lines):
                 if "Scene:" in line:
                     scene_description = line[6:]
+
+            if not scene_description:
+                print("Error: failed to parse scene description from the following lines\n"
+                      , frame_text_section)
+                continue
 
             # Reading in each character moment
             character_moments = []
@@ -224,28 +262,45 @@ class ComicBookPrompter:
 
         return best_character
 
+    @staticmethod
+    def generate_prompt(frame):
+        """
+        Generate a prompt for the diffusion model given a frame
+        Meant to be used with multiprocessing
+        :param frame: The frame to generate a prompt for
+        :param openai: The OpenAI object to send the prompt to
+        :return: The prompt for the diffusion model
+        """
+        to_prompt = open("story_generator/prompts/frame_to_diffusion_prompt.txt", "r").read()
+        to_prompt = to_prompt.replace("$SCENE_DESCRIPTION", frame.scene_description)
+
+        # Adding character information to the prompt
+        for i, character_moment in enumerate(frame.character_moments):
+            to_prompt += "\nCharacter " + str(i) + ":\n"
+            to_prompt += character_moment.no_dialogue_description() + "\n"
+
+        messages = [
+            {"role": "system", "content": "You are a good diffusion model prompter engineer that is concise\n"
+                                          "Always use physical descriptions including gender and race\n"},
+            {"role": "user", "content": to_prompt}
+        ]
+        with open('story_generator/chatgpt_key.txt', 'r') as file:
+            key = file.read().replace('\n', '')
+        print("Sending prompt to OpenAI")
+        response = OpenAI(api_key=key).chat.completions.create(
+            model="gpt-4-turbo-preview",
+            messages=messages
+        )
+        print("Got response from OpenAI")
+        return response.choices[0].message.content
+
     def get_diffusion_prompts_for_frames(self):
         """
         Get the diffusion prompts for each frame
         :return: A list of prompts for each frame
         """
-        prompts = []
-        for frame in self.frames:
-            to_prompt = open("story_generator/prompts/frame_to_diffusion_prompt.txt", "r").read()
-            to_prompt = to_prompt.replace("$SCENE_DESCRIPTION", frame.scene_description)
-
-            # Adding character information to the prompt
-            for i, character_moment in enumerate(frame.characters):
-                to_prompt += "\nCharacter " + str(i) + ":\n"
-                to_prompt += character_moment.no_dialogue_description() + "\n"
-
-            messages = [
-                {"role": "system", "content": "You are a good diffusion model prompter engineer that is concise\n"
-                                              "Always use physical descriptions including gender and race\n"},
-                {"role": "user", "content": to_prompt}
-            ]
-            output = self.ask_chat_gpt(messages)
-            prompts.append(output)
+        with Pool() as p:
+            prompts = p.map(self.generate_prompt, self.frames)
         return prompts
 
     def __str__(self):
@@ -266,5 +321,9 @@ class ComicBookPrompter:
 
         return out
 
-
-
+    def to_dict(self):
+        out = {"title": self.title,
+               "outline": self.outline,
+               "characters": [character.to_dict() for character in self.characters],
+               "frames": [frame.to_dict() for frame in self.frames]}
+        return out

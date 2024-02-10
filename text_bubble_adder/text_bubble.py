@@ -1,8 +1,11 @@
+import copy
+
 from PIL import Image, ImageDraw, ImageFont
 from .clipseg import get_location
 from story_components.character import CharacterMoment, Character
 from story_components.frame import Frame
 import math
+from textwrap3 import fill
 
 MAX_TEXT_WIDTH = 200
 
@@ -36,10 +39,10 @@ def pick_relative_location(image: Image, head_location, t_width, t_height):
 
     # If the head is on the left side of the image, the text bubble will be on the right side
     if head_x < image_width / 2:
-        x = head_x + 60
+        x = head_x - 60 - t_width
     # If the head is on the right side of the image, the text bubble will be on the left side
     else:
-        x = head_x - 60 - t_width
+        x = head_x + 60
 
     # Placing the bubble above the head
     # If the bubble would go off the top of the image, place it as high as possible
@@ -55,7 +58,7 @@ def calculate_text_size(text: str, font):
     longest_line = max(lines, key=len)
     bbox = font.getbbox(longest_line)
     single_line_height = bbox[3] - bbox[1]
-    return bbox[2] - bbox[0], (single_line_height + single_line_height / 3 + 2) * len(lines)
+    return bbox[2] - bbox[0], (single_line_height + single_line_height / 6) * len(lines)
 
 
 def wrap_text(text: str, max_width=MAX_TEXT_WIDTH):
@@ -65,31 +68,12 @@ def wrap_text(text: str, max_width=MAX_TEXT_WIDTH):
     :param max_width: The maximum width of the text in pixels
     :return: The same text with newlines added to wrap the text
     """
-    # Finds a space and replaces it with a newline character
-    # Tries to keep each line to a length of x characters
-    # Searches for the nearest space to the xth character without going over
-    l = 0
-    best_space = None
-    temp_text = ""
-    for i, c in enumerate(text):
-        if c != "\n":
-            l += 1
-            temp_text += text[i]
-        if c == "\n":
-            l = 0
-        width_of_temp_text = font.getbbox(temp_text)[2] - font.getbbox(temp_text)[0]
-        if width_of_temp_text > max_width:
-            if best_space:
-                text = text[:best_space] + "\n" + text[best_space + 1:]
-                l = i - best_space
-                best_space = None
-                temp_text = ""
-            else:
-                text = text[:i] + "\n" + text[i + 1:]
-                l = 0
-                temp_text = ""
-        elif c == " ":
-            best_space = i
+    bbox_if_single_line = font.getbbox(text)
+    # Average character width
+    char_width = (bbox_if_single_line[2] - bbox_if_single_line[0]) / len(text)
+
+    text = fill(text, width=int(max_width / char_width))
+
     return text
 
 
@@ -112,9 +96,9 @@ def find_head_edge(image: Image, head_location, logits):
 
     head_logit = logits[int(head_y)][int(head_x)]
     if head_x < image_width / 2:
-        direction = 1
-    else:
         direction = -1
+    else:
+        direction = 1
 
     # Find the edge of the head
     check_x = head_x
@@ -159,6 +143,67 @@ class TextBubble:
             if math.sin(angle) == 0:
                 self.loc = (self.loc[0], self.loc[1] + 40)
 
+    def draw(self, image):
+        """
+        Draws a triangle, then an ellipse, then another triangle to remove part of the border, then the text
+        :param image: PIL Image to draw on
+        :return: The modified PIL Image
+        """
+
+        ARROW_WIDTH = 40
+
+        draw = ImageDraw.Draw(image)
+        # Define the location and size of the text bubble
+        bubble_rect = [self.loc[0], self.loc[1], self.loc[0] + self.width, self.loc[1] + self.height]
+
+        center_x = self.loc[0] + self.width / 2
+        center_y = self.loc[1] + self.height / 2
+
+        # Draw a triangle from the head edge to the text bubble
+        head_edge_x = self.point_to_loc[0]
+        head_edge_y = self.point_to_loc[1]
+
+        # Calculate two offset points from the center of the ellipse perpendicular to the line to the point_to_loc
+        angle = math.atan2(head_edge_y - (self.loc[1] + self.height / 2), head_edge_x - (self.loc[0] + self.width / 2))
+
+        # p1 and p2 are near the center of the ellipse but, a couple of pixels perpendicular to the line to the point_to_loc
+        p1 = (center_x + ARROW_WIDTH * math.cos(angle + math.pi / 2),
+              center_y + ARROW_WIDTH * math.sin(angle + math.pi / 2))
+        p2 = (center_x + ARROW_WIDTH * math.cos(angle - math.pi / 2),
+              center_y + ARROW_WIDTH * math.sin(angle - math.pi / 2))
+        p3 = (head_edge_x, head_edge_y)
+
+        # Draw the triangle
+        draw.polygon([p1[0], p1[1], p2[0], p2[1], p3[0], p3[1]], fill='white', outline='black', width=5)
+
+        # Draw the bubble
+        draw.ellipse(bubble_rect, fill='white', outline='black', width=5)
+
+        ss = 0.6
+
+        # Draw a triangle to remove part of the border
+        p1 = (center_x + ARROW_WIDTH * ss * math.cos(angle + math.pi / 2),
+              center_y + ARROW_WIDTH * ss * math.sin(angle + math.pi / 2))
+        p2 = (center_x + ARROW_WIDTH * ss * math.cos(angle - math.pi / 2),
+              center_y + ARROW_WIDTH * ss * math.sin(angle - math.pi / 2))
+        p3 = (head_edge_x, head_edge_y)
+
+        # Draw the triangle
+        draw.polygon([p1[0], p1[1], p2[0], p2[1], p3[0], p3[1]], fill='white', outline='white')
+
+        # Add the text to the bubble
+        text_width, text_height = calculate_text_size(self.text, font)
+        text_top_left = (self.loc[0] + (self.width - text_width) / 2, self.loc[1] + (self.height - text_height) / 2)
+
+        draw.text(text_top_left, self.text, fill='black', font=font, align="center")
+
+        # Draw a dot at the center of the bubble and at the head edge
+        # draw.ellipse([self.loc[0] + self.width / 2 - 2, self.loc[1] + self.height / 2 - 2,
+        #               self.loc[0] + self.width / 2 + 2, self.loc[1] + self.height / 2 + 2], fill='blue')
+        # draw.ellipse([head_edge_x - 2, head_edge_y - 2, head_edge_x + 2, head_edge_y + 2], fill='red')
+
+        return image
+
 
 def add_text_bubbles(image: Image, frame):
     """
@@ -187,8 +232,8 @@ def add_text_bubbles(image: Image, frame):
         dialogue = wrap_text(dialogue, 200)
         text_width, text_height = calculate_text_size(dialogue, font)
 
-        bubble_width = text_width * 1.25 + font_size * 2
-        bubble_height = text_height * 1.25 + font_size * 2
+        bubble_width = text_width + font_size * 3
+        bubble_height = text_height + font_size * 3
 
         vals = get_location(image, [physical_description])
         head_location = (vals[0], vals[1])
@@ -211,6 +256,20 @@ def add_text_bubbles(image: Image, frame):
             TextBubble(bubble_top_left, bubble_width, bubble_height, head_edge, dialogue, head_location))
 
     """
+    Checking for bubbles covering the faces of other characters that have dialogue bubbles
+    """
+    for _ in range (2):
+        all_face_locations = [text_bubble.point_to_loc for text_bubble in text_bubbles]
+        for i, text_bubble in enumerate(text_bubbles):
+            for j, face_location in enumerate(all_face_locations):
+                if text_bubble.loc[0] < face_location[0] < text_bubble.loc[0] + text_bubble.width and \
+                        text_bubble.loc[1] < face_location[1] < text_bubble.loc[1] + text_bubble.height:
+                    # If the face is covered by a bubble, move the bubble
+                    print("COVERING FACE")
+                    text_bubble.loc = (text_bubble.loc[0], face_location[1] - text_bubble.height - 80)
+
+
+    """
     Deconflicting bubbles that may overlap or cross each other with their triangles
     """
     for i in range(len(text_bubbles)):
@@ -223,54 +282,41 @@ def add_text_bubbles(image: Image, frame):
                 print("DECONFLICTING")
                 text_bubbles[j].loc = (text_bubbles[j].loc[0], text_bubbles[i].loc[1] + text_bubbles[i].height + 80)
 
+    """
+    Moving bubbles so they are entirely on the screen
+    """
+    for text_bubble in text_bubbles:
+        if text_bubble.loc[0] < 0:
+            text_bubble.loc = (0, text_bubble.loc[1])
+        if text_bubble.loc[0] + text_bubble.width > image.size[0]:
+            text_bubble.loc = (image.size[0] - text_bubble.width, text_bubble.loc[1])
+        if text_bubble.loc[1] < 0:
+            text_bubble.loc = (text_bubble.loc[0], 0)
+        if text_bubble.loc[1] + text_bubble.height > image.size[1]:
+            text_bubble.loc = (text_bubble.loc[0], image.size[1] - text_bubble.height)
+
     # for text_bubble in text_bubbles:
     #     text_bubble.get_off_of_point_to_loc()
 
     """
     Drawing the bubbles and triangles
     """
-    draw = ImageDraw.Draw(image)
 
     for text_bubble in text_bubbles:
-        # Define the location and size of the text bubble
-        bubble_location = [text_bubble.loc[0], text_bubble.loc[1], text_bubble.loc[0] + text_bubble.width,
-                           text_bubble.loc[1] + text_bubble.height]
-
-        # Draw a triangle from the head edge to the text bubble
-        head_edge_x = text_bubble.point_to_loc[0]
-        head_edge_y = text_bubble.point_to_loc[1]
-        draw.polygon([head_edge_x, head_edge_y, text_bubble.loc[0], text_bubble.loc[1] + text_bubble.height / 2,
-                      text_bubble.loc[0] + text_bubble.width, text_bubble.loc[1] + text_bubble.height / 2],
-                     fill='white', outline='black')
-
-        # Draw the text bubble
-        draw.ellipse(bubble_location, fill='white', outline='black')
-
-        text_top_left = (text_bubble.loc[0] + (text_bubble.width - text_width) / 2,
-                         text_bubble.loc[1] + (text_bubble.height - text_height) / 2)
-
-        # Add the text to the bubble
-        draw.text(text_top_left, text_bubble.text, fill='black', font=font)
-
-        # Debug drawing
-        # draw = ImageDraw.Draw(image)
-        # draw.ellipse([head_edge_x - 5, head_edge_y - 5, head_edge_x + 5, head_edge_y + 5],
-        #              fill='blue', outline='blue')
-        # draw.ellipse([text_bubble.head_loc[0] - 5, text_bubble.head_loc[1] - 5, text_bubble.head_loc[0] + 5,
-        #               text_bubble.head_loc[1] + 5], fill='red',
-        #              outline='red')
-        # draw.line([text_bubble.point_to_loc[0], text_bubble.point_to_loc[1], text_bubble.loc[0], text_bubble.loc[1]],
-        #           fill='black')
-
+        image = text_bubble.draw(image)
 
     # Extending the image by 120 pixels at the bottom to put the scene description
-    image = image.resize((image.size[0], image.size[1] + 120))
+    # Create a new blank image with the desired dimensions
+    new_image = Image.new("RGB", (image.width, image.height + 120), color="white")
+
+    # Paste the original image onto the new blank image
+    new_image.paste(image, (0, 0))
+    image = new_image
     draw = ImageDraw.Draw(image)
     draw.rectangle([0, image.size[1] - 120, image.size[0], image.size[1]], fill='white')
     draw.text((10, image.size[1] - 110), wrap_text(frame.scene_description, 900), fill='black', font=font)
 
     return image
-
 
 
 if __name__ == "__main__":
@@ -284,9 +330,9 @@ if __name__ == "__main__":
     shadow = CharacterMoment(Character("Shadow", "Wearing green",
                                        "Cunning and mysterious"), "dodges", "You can't catch me, Guardian!")
 
-    description = "A top a skyscraper, Guardian and Shadow face off, there is a storm in the background and the battle is" +\
-                    " intense. The city is visible below, and the sun is setting. Today is the day that the fate of the city" +\
-                    " will be decided."
+    description = "A top a skyscraper, Guardian and Shadow face off, there is a storm in the background and the battle is" + \
+                  " intense. The city is visible below, and the sun is setting. Today is the day that the fate of the city" + \
+                  " will be decided."
     frame = Frame(description, [guardian, shadow])
     output = add_text_bubbles(Image.open("text_bubble_adder/twoguys.jpg"), frame)
     # Save the image

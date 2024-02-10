@@ -15,6 +15,7 @@ Every character that appears must be from the list of characters provided.
 If there are no characters in a frame, then don't include the <character> tag.
 
 The dialogue must be concise to fit within a bubble in the comic book.
+The scene description must be less than 40 words.
 
 Each frame must follow the following format, with the <character> and <start> tags used exactly as shown:
 

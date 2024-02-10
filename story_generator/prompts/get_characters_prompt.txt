@@ -7,7 +7,10 @@ Description requirements:
 2. The description should include lots of details about the character's appearance
 3. Details about the character's personality should also be included.
 4. Each description must be no more than 80 characters long.
-5. The gender and race of the character must be included in the description explicitly.
+5. The gender must be included in the description.
+6. The race must be included in the description.
+
+To help support diversity, each character should be of a different race.
 
 Each character description must follow the following format, including the starting tag:
 
@@ -15,3 +18,5 @@ Each character description must follow the following format, including the start
 Name: [Character Name]
 Physical: [Character Description]
 Personality: [Character Description]
+Gender: [Character's Gender (male or female)]
+Race: [Character's Race]
