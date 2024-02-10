@@ -15,9 +15,15 @@ def get_image(prompt):
     payload = {
         "inputs": prompt,
     }
+    good = False
+    while not good:
+        try:
+            response = requests.post(API_URL, headers=headers, json=payload)
+            response.raise_for_status()  # What does this line do?  -> This line raises an HTTPError if the HTTP request returned an unsuccessful status code.
+            good = True
+        except requests.exceptions.HTTPError as err:
+            print("Error: " + str(err))
 
-    response = requests.post(API_URL, headers=headers, json=payload)
-    response.raise_for_status()
     image_bytes = response.content
     image = Image.open(io.BytesIO(image_bytes))
     return image

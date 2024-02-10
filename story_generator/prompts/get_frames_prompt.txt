@@ -14,7 +14,9 @@ The story must be left open-ended, so more frames can be added later.
 Every character that appears must be from the list of characters provided.
 If there are no characters in a frame, then don't include the <character> tag.
 
-Each frame must follow the following format:
+The dialogue must be concise to fit within a bubble in the comic book.
+
+Each frame must follow the following format, with the <character> and <start> tags used exactly as shown:
 
 <start>
 Frame: [frame number]
@@ -23,5 +25,15 @@ Scene: [detailed scene description]
 Name: [name of character being used from list above]
 Action: [character action]
 Dialogue: [character dialogue for the frame]
-<character>  <--- this tag will be used to separate each character's info in the frame
+<character>
 [ANOTHER CHARACTER INFO i.e. Name, Action, Dialogue] <--- Only use this tag if there is another character in the frame
+
+
+Example Frame:
+<start>
+Frame: 1
+Scene: The bustling city streets of Metropolis, a setting of tall skyscrapers and flashing neon lights.
+<character>
+Name: Captain Stellar
+Action: Striking a heroic pose, Captain Stellar stands atop a tall building, overlooking the city. Shadowbolt stands by his side, ready for action.
+Dialogue: "Shadowbolt, we must protect this city at all costs. Together, we are unstoppable!"

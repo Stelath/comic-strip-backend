@@ -1,13 +1,12 @@
-Given the following information about a frame for a comic strip, write a descriptive prompt for a diffusion model.
+Given the following information about a frame for a comic strip, write a caption for a visually impaired reader, describing the visual qualities of the frame.
 
-- All characters must be mentioned in the prompt, so that they show up in the frame
-- The prompt should start with "marvel comic book art"
+- All characters must be mentioned
 - Avoid lots of stopwords, like "the" and "and"
-- The prompt should be 100-200 characters long
-- Do not use any character names in the prompt because the diffusion model will not know them
-- Be explicit with gender when describing characters
+- 100-200 characters long
+- Do not use the character's names in the description rather use their physical descriptions
+- Be explicit with gender, race, and human, when describing characters
 - You must give physical descriptions of the characters rather than use their name
+- The reader does not understand the context of the scene, so you must describe the scene in a way that makes sense without context
+- Explicitly state the species of every character even though they are all human
 
 Scene Description: $SCENE_DESCRIPTION
-
-

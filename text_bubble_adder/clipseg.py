@@ -3,9 +3,10 @@ from transformers import AutoProcessor, CLIPSegForImageSegmentation
 import torch.nn.functional as F
 from PIL import Image
 import matplotlib.pyplot as plt
+import os
 
-processor = AutoProcessor.from_pretrained("CIDAS/clipseg-rd64-refined")
-model = CLIPSegForImageSegmentation.from_pretrained("CIDAS/clipseg-rd64-refined")
+# processor = AutoProcessor.from_pretrained("CIDAS/clipseg-rd64-refined")
+# model = CLIPSegForImageSegmentation.from_pretrained("CIDAS/clipseg-rd64-refined")
 
 
 def get_location(image, texts):
@@ -49,11 +50,7 @@ def get_location(image, texts):
     scaled_logits = F.interpolate(logits, size=(image.height, image.width), mode='bilinear', align_corners=False)
     # Render the logits
     plt.imshow(scaled_logits.squeeze(0).squeeze(0).detach().numpy())
-    plt.show()
+    # plt.show()
 
     scaled_logits = scaled_logits.squeeze(0).squeeze(0)
     return x, y, scaled_logits
-
-
-
-

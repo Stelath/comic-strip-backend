@@ -1,9 +1,14 @@
-Our goal is to provide an excellent comic book based on a user prompt.
+Our goal is to provide an excellent simple children's comic book based on a user prompt.
 
 User prompt: "
 $USER-PROMPT
 "
 
-Write a general outline of the story.
-It must be roughly 100 words.
-It must leave room for additional parts of the story to be added later.
+Write a story with character names and details.
+It must be roughly 200 words.
+Use a list of 4 to 6 events that flow clearly to make the story easy to understand.
+The introduction must introduce the characters and setting.
+Every event must be easy to understand, very visual, and have a clear goal and cause.
+Write the story such that a stupid child can understand.
+The story should not be complete, the events must flow very gradually with slow pacing
+

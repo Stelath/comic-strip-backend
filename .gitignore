@@ -165,3 +165,11 @@ cython_debug/
 .DS_Store
 *.zip
 
+# Ignore anything that ends with .jpg, .jpeg, .png, .gif
+*.jpg
+*.jpeg
+*.png
+*.gif
+
+/text_bubble_adder/clipseg-rd64-refined/
+/model/

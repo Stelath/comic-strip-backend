@@ -1,9 +1,16 @@
 from PIL import Image, ImageDraw, ImageFont
 from .clipseg import get_location
 from story_components.character import CharacterMoment, Character
+from story_components.frame import Frame
 import math
 
 MAX_TEXT_WIDTH = 200
+
+font_size = 30
+font = ImageFont.truetype("text_bubble_adder/BackIssuesBB_ital.otf", font_size)
+sample_text = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz     "
+bbox = font.getbbox(sample_text)
+CHAR_WIDTH = (bbox[2] - bbox[0]) / len(sample_text)
 MAX_HEIGHT = 40
 
 
@@ -51,26 +58,38 @@ def calculate_text_size(text: str, font):
     return bbox[2] - bbox[0], (single_line_height + single_line_height / 3 + 2) * len(lines)
 
 
-def wrap_text(text: str):
+def wrap_text(text: str, max_width=MAX_TEXT_WIDTH):
+    """
+    Wraps text to a certain width
+    :param text: The text to be wrapped (i.e. adding newlines)
+    :param max_width: The maximum width of the text in pixels
+    :return: The same text with newlines added to wrap the text
+    """
     # Finds a space and replaces it with a newline character
     # Tries to keep each line to a length of x characters
     # Searches for the nearest space to the xth character without going over
-
     l = 0
     best_space = None
+    temp_text = ""
     for i, c in enumerate(text):
-        if c == " ":
-            best_space = i
         if c != "\n":
             l += 1
-        if l > MAX_TEXT_WIDTH / 5:
+            temp_text += text[i]
+        if c == "\n":
+            l = 0
+        width_of_temp_text = font.getbbox(temp_text)[2] - font.getbbox(temp_text)[0]
+        if width_of_temp_text > max_width:
             if best_space:
                 text = text[:best_space] + "\n" + text[best_space + 1:]
                 l = i - best_space
                 best_space = None
+                temp_text = ""
             else:
                 text = text[:i] + "\n" + text[i + 1:]
                 l = 0
+                temp_text = ""
+        elif c == " ":
+            best_space = i
     return text
 
 
@@ -141,27 +160,31 @@ class TextBubble:
                 self.loc = (self.loc[0], self.loc[1] + 40)
 
 
-def add_text_bubbles(image: Image, character_moments: list[CharacterMoment]):
+def add_text_bubbles(image: Image, frame):
     """
     Adds text bubbles to an image
     :param image: PIL Image that the text bubbles will be added to
     :param character_moments: A list of CharacterMoments in the frame
     :return: A PIL Image with text bubbles
     """
-    font_size = 30
-    font = ImageFont.truetype("text_bubble_adder/textbubblefont.ttf", font_size)
+
+    character_moments = frame.character_moments
 
     """
     Getting a bubble for each character in the frame
     """
+
+    print(f"adding text bubbles to {len(character_moments)} characters)")
 
     text_bubbles = []
     for character_moment in character_moments:
         physical_description = character_moment.physical_description
         dialogue = character_moment.dialogue
 
+        print("Adding text bubble for", physical_description, "with dialogue", dialogue)
+
         # Wrap the text
-        dialogue = wrap_text(dialogue)
+        dialogue = wrap_text(dialogue, 200)
         text_width, text_height = calculate_text_size(dialogue, font)
 
         bubble_width = text_width * 1.25 + font_size * 2
@@ -177,6 +200,12 @@ def add_text_bubbles(image: Image, character_moments: list[CharacterMoment]):
         # Moving the bubble up or down from the head_edge if they have a similar y value
         if abs(bubble_top_left[1] - head_edge[1]) < 10:
             bubble_top_left = (bubble_top_left[0], head_edge[1] - bubble_height - 20)
+
+        # Checking if the bubble is off the left or right side of the image
+        if bubble_top_left[0] < 0:
+            bubble_top_left = (0, bubble_top_left[1])
+        if bubble_top_left[0] + bubble_width > image.size[0]:
+            bubble_top_left = (image.size[0] - bubble_width, bubble_top_left[1])
 
         text_bubbles.append(
             TextBubble(bubble_top_left, bubble_width, bubble_height, head_edge, dialogue, head_location))
@@ -233,6 +262,13 @@ def add_text_bubbles(image: Image, character_moments: list[CharacterMoment]):
         # draw.line([text_bubble.point_to_loc[0], text_bubble.point_to_loc[1], text_bubble.loc[0], text_bubble.loc[1]],
         #           fill='black')
 
+
+    # Extending the image by 120 pixels at the bottom to put the scene description
+    image = image.resize((image.size[0], image.size[1] + 120))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle([0, image.size[1] - 120, image.size[0], image.size[1]], fill='white')
+    draw.text((10, image.size[1] - 110), wrap_text(frame.scene_description, 900), fill='black', font=font)
+
     return image
 
 
@@ -240,11 +276,18 @@ def add_text_bubbles(image: Image, character_moments: list[CharacterMoment]):
 if __name__ == "__main__":
     # Example usage
 
+    print("starting example usage of text_bubble.py")
+
     guardian = CharacterMoment(Character("Guardian",
                                          "Tall and muscular, with a strong and chiseled jawline. Shiny silver armor with a glowing emblem on the chest.",
                                          "Brave and selfless"), "punches", "You're going down, villain!")
     shadow = CharacterMoment(Character("Shadow", "Wearing green",
                                        "Cunning and mysterious"), "dodges", "You can't catch me, Guardian!")
-    output = add_text_bubbles(Image.open("twoguys.jpg"), [guardian, shadow])
+
+    description = "A top a skyscraper, Guardian and Shadow face off, there is a storm in the background and the battle is" +\
+                    " intense. The city is visible below, and the sun is setting. Today is the day that the fate of the city" +\
+                    " will be decided."
+    frame = Frame(description, [guardian, shadow])
+    output = add_text_bubbles(Image.open("text_bubble_adder/twoguys.jpg"), frame)
     # Save the image
     output.save("output1.jpg")
