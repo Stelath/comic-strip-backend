@@ -1,0 +1,27 @@
+Based on the following outline and character descriptions, generate $FRAME_COUNT frames for creating a comic book.
+
+Outline:
+$OUTLINE
+
+Character Descriptions:
+$CHARACTER_DESCRIPTIONS
+
+Each frame must be similar to the style of a Marvel superhero comic book.
+The frame info provided will be used later in a diffusion model to generate a comic book.
+
+Each frame should progress the story, none should bring the story to a conclusion.
+The story must be left open-ended, so more frames can be added later.
+Every character that appears must be from the list of characters provided.
+If there are no characters in a frame, then don't include the <character> tag.
+
+Each frame must follow the following format:
+
+<start>
+Frame: [frame number]
+Scene: [detailed scene description]
+<character>
+Name: [name of character being used from list above]
+Action: [character action]
+Dialogue: [character dialogue for the frame]
+<character>  <--- this tag will be used to separate each character's info in the frame
+[ANOTHER CHARACTER INFO i.e. Name, Action, Dialogue]

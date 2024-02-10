@@ -1,0 +1,16 @@
+Given the following story outline, generate a list of $NUM_CHARACTERS characters and their descriptions.
+
+Outline: $OUTLINE
+
+Description requirements:
+1. Each character must have a name and a description.
+2. The description should include lots of details about the character's appearance
+3. Details about the character's personality should also be included.
+4. Each description must be no more than 80 characters long.
+
+Each character description must follow the following format, including the starting tag:
+
+<start>
+Name: [Character Name]
+Physical: [Character Description]
+Personality: [Character Description]

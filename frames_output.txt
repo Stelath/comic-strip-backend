@@ -1,0 +1,66 @@
+<start>
+Frame: 1
+Scene: The bustling city streets, filled with cars and pedestrians.
+<character>
+Name: Skybound
+Action: Soaring high above the city, Skybound looks down with determination in his eyes.
+Dialogue: "I was born to fly and protect this city from all harm."
+
+<character>
+Name: <no character>
+Action: N/A
+Dialogue: N/A
+
+<start>
+Frame: 2
+Scene: Flashback to Skybound's childhood. A young Skybound trips and falls, but instead of hitting the ground, he starts to float.
+<character>
+Name: Skybound
+Action: Wide-eyed and amazed, young Skybound tries to grasp what is happening.
+Dialogue: "What's happening to me? I can fly!"
+
+<character>
+Name: <no character>
+Action: N/A
+Dialogue: N/A
+
+<start>
+Frame: 3
+Scene: A dark alley filled with shadows. Vortex emerges, his powers swirling around him.
+<character>
+Name: Vortex
+Action: With an evil grin, Vortex prepares to wreak havoc on the city.
+Dialogue: "Skybound, you thought you could escape me, but now, I will make you pay."
+
+<character>
+Name: <no character>
+Action: N/A
+Dialogue: N/A
+
+<start>
+Frame: 4
+Scene: Skybound and Vortex in mid-air, locked in a fierce battle. Buildings can be seen below.
+<character>
+Name: Skybound
+Action: Tightly clutching his fists, Skybound charges towards Vortex, determined to defeat him.
+Dialogue: "I won't let you destroy this city!"
+
+<character>
+Name: Vortex
+Action: Manipulating the air currents, Vortex sends a powerful gust towards Skybound, knocking him off balance.
+Dialogue: "You're no match for my powers, Skybound!"
+
+<start>
+Frame: 5
+Scene: An isolated mountaintop at sunset, where Skybound is training under the guidance of a wise mentor.
+<character>
+Name: Skybound
+Action: Sweating and panting, Skybound pushes himself to the limits, trying to expand his flying skills.
+Dialogue: "I will become stronger. I will become the hero this city needs."
+
+<character>
+Name: Wise Mentor
+Action: Observing Skybound's training, the wise mentor nods with approval.
+Dialogue: "You have the potential, young one. Keep pushing, and you will discover new heights."
+
+Remember, these frames are meant to be used in a diffusion model to generate a comic book.

@@ -1,0 +1,9 @@
+Our goal is to provide an excellent comic book based on a user prompt.
+
+User prompt: "
+$USER-PROMPT
+"
+
+Write a general outline of the story.
+It must be roughly 100 words.
+It must leave room for additional parts of the story to be added later.
