@@ -1,0 +1,12 @@
+Given the following information about a frame for a comic strip, write a descriptive prompt for a diffusion model.
+
+- All characters must be mentioned in the prompt, so that they show up in the frame
+- The prompt should start with "marvel comic book art"
+- Avoid lots of stopwords, like "the" and "and"
+- The prompt should be 100-200 characters long
+- Do not use any character names in the prompt because the diffusion model will not know them
+
+
+Scene Description: $SCENE_DESCRIPTION
+
+
