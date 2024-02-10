@@ -1,7 +1,7 @@
 from story_generator.story_prompter import ComicBookPrompter
 
 """Testing"""
-user_prompt = "A superhero comic book about a hero who can fly"
+user_prompt = "A super hero and their sidekick fight each other"
 story = ComicBookPrompter(user_prompt)
 
 # Write story to file

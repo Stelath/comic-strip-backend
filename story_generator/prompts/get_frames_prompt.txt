@@ -24,4 +24,4 @@ Name: [name of character being used from list above]
 Action: [character action]
 Dialogue: [character dialogue for the frame]
 <character>  <--- this tag will be used to separate each character's info in the frame
-[ANOTHER CHARACTER INFO i.e. Name, Action, Dialogue]
+[ANOTHER CHARACTER INFO i.e. Name, Action, Dialogue] <--- Only use this tag if there is another character in the frame

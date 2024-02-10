@@ -5,7 +5,8 @@ Given the following information about a frame for a comic strip, write a descrip
 - Avoid lots of stopwords, like "the" and "and"
 - The prompt should be 100-200 characters long
 - Do not use any character names in the prompt because the diffusion model will not know them
-
+- Be explicit with gender when describing characters
+- You must give physical descriptions of the characters rather than use their name
 
 Scene Description: $SCENE_DESCRIPTION
 
