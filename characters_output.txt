@@ -1,4 +1,19 @@
 <start>
-Name: Skybound
-Physical: Skybound is a young man with jet-black hair and piercing blue eyes. He possesses a lean yet muscular build, with agile limbs and a confident stance. He wears a sleek blue and white costume that allows for freedom of movement in the air.
-Personality: Skybound is courageous and compassionate, driven by a strong sense of justice to protect the innocent. He is determined and resilient, always striving to improve his abilities. Yet, he also carries the weight of responsibility and sometimes doubts his own capabilities.
+Name: Victor "Vortex" Reynolds
+Physical: Tall and muscular with jet-black hair, piercing blue eyes, and a prominent scar across his left cheek.
+Personality: Serious and focused, Vortex is relentless in his pursuit of justice. He is driven by a desire to protect the innocent at all costs.
+
+<start>
+Name: Lily "Spark" Thompson
+Physical: Petite and agile with fiery red hair, freckles, and bright green eyes that shimmer with determination.
+Personality: Energetic and impulsive, Spark brings a playful spirit to crime-fighting. Her optimism and quick thinking make her a valuable asset.
+
+<start>
+Name: Damien "Darkstrike" Blackwood
+Physical: Tall and lean with unruly black hair, intense silver eyes, and a mysterious air that surrounds him.
+Personality: Brooding and secretive, Darkstrike is driven by a relentless desire for vengeance. He is willing to cross any line to achieve justice.
+
+<start>
+Name: Mia "Phoenix" Rodriguez
+Physical: Athletic and graceful with long flowing brown hair, piercing amber eyes, and a tattoo of a phoenix on her wrist.
+Personality: Fearless and compassionate, Phoenix fights for justice with a burning passion. Her loyalty and determination inspire those around her.

@@ -220,7 +220,8 @@ class ComicBookPrompter:
                 to_prompt += character_moment.no_dialogue_description() + "\n"
 
             messages = [
-                {"role": "system", "content": "You are a good diffusion model prompter"},
+                {"role": "system", "content": "You are a good diffusion model prompter engineer that is concise\n"
+                                              "Always use physical descriptions including gender\n"},
                 {"role": "user", "content": to_prompt}
             ]
             output = self.ask_chat_gpt(messages)
