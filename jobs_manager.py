@@ -8,10 +8,10 @@ class JobManager:
     def __init__(self):
         self.jobs = {}
     
-    def new_job(self, prompt):
+    def new_job(self, prompt, num_images):
         job_id = self.generate_job_id()
         
-        comic_generator = ComicGenerator(prompt, job_id)
+        comic_generator = ComicGenerator(prompt, job_id, num_images)
         self.add_job(job_id, comic_generator)
         
         thread = threading.Thread(target=comic_generator.generate)
