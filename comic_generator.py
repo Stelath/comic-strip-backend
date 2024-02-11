@@ -14,7 +14,8 @@ def process_prompt(data):
     return image
 
 class ComicGenerator():
-    def __init__(self, prompt, job_id) -> None:
+    def __init__(self, prompt, job_id, num_images) -> None:
+        self.num_images = num_images
         self.start_time = time.time()
         self.end_time = None
         self.time_taken = None
@@ -32,7 +33,7 @@ class ComicGenerator():
         os.makedirs(output_dir, exist_ok=True)
         os.makedirs(os.path.join(output_dir, 'frames'), exist_ok=True)
         
-        story = ComicBookPrompter(self.user_prompt, num_frames=8)
+        story = ComicBookPrompter(self.user_prompt, num_frames=self.num_images)
         self.story_title = story.title
         self.current_state = "Story built"
         self.progress = 0.2
