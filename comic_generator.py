@@ -8,7 +8,10 @@ from multiprocessing import Pool
 def process_prompt(data):
     i, prompt = data
     print(f"Gathering image for frame {i}")
-    return get_image(prompt)
+    image = get_image(prompt)
+    print(f"Got image: {i}")
+    
+    return image
 
 class ComicGenerator():
     def __init__(self, prompt, job_id) -> None:
@@ -25,8 +28,10 @@ class ComicGenerator():
     
     def generate(self):
         output_dir = os.path.join('generated_comics', self.job_id)
+        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(os.path.join(output_dir, 'frames'), exist_ok=True)
         
-        story = ComicBookPrompter(self.user_prompt)
+        story = ComicBookPrompter(self.user_prompt, num_frames=8)
         self.current_state = "Story built"
         self.progress = 0.2
         
@@ -48,7 +53,11 @@ class ComicGenerator():
         
         for i, image in enumerate(frame_images):
             image = add_text_bubbles(image, story.frames[i])
-            image.save(os.path.join(output_dir, f"/frame_{i:03}.png"))
+            
+            frame_name = f"frame_{i:03}.png"
+            # print(f"Saving frame {i} to {os.path.join(output_dir, 'frames', frame_name)}")
+            image.save(os.path.join(output_dir, 'frames', frame_name))
+            self.frames.append(os.path.join('/api', 'images', self.job_id, frame_name))
         
         self.current_state = "Text Bubbles Added"
         self.progress = 1.0
@@ -56,6 +65,3 @@ class ComicGenerator():
         self.end_time = time.time()
         self.time_taken = self.end_time - self.start_time
         self.current_state = "Completed"
-        
-        with open(os.path.join(output_dir, 'full_story.txt'), "w") as file:
-            file.write(str(story))

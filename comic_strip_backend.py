@@ -1,6 +1,7 @@
 from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS
 
+import os
 from jobs_manager import JobManager
 
 app = Flask(__name__)
@@ -27,6 +28,11 @@ def process_prompt():
 
 @app.route("/api/jobs/<job_id>", methods=['GET'])
 def get_job_status(job_id):
+    print(f"Getting job status for {job_id}")
     info = job_manager.get_job_info(job_id)
     
     return jsonify(info)
+
+@app.route("/api/images/<job_id>/<path:name>", methods=['GET'])
+def get_frame(job_id, name):
+    return send_from_directory('generated_comics', os.path.join(job_id, 'frames', name))

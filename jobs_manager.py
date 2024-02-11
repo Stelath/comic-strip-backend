@@ -1,5 +1,6 @@
 import uuid
 import time
+import threading
 
 from comic_generator import ComicGenerator
 
@@ -13,7 +14,8 @@ class JobManager:
         comic_generator = ComicGenerator(prompt, job_id)
         self.add_job(job_id, comic_generator)
         
-        comic_generator.generate()
+        thread = threading.Thread(target=comic_generator.generate)
+        thread.start()
         
         return job_id
     
