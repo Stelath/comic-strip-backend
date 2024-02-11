@@ -7,7 +7,7 @@ import time
 
 
 class ComicGenerator():
-    def __init__(self, prompt, job_id, num_images) -> None:
+    def __init__(self, prompt, job_id, num_images=8) -> None:
         self.num_images = num_images
         self.start_time = time.time()
         self.end_time = None
