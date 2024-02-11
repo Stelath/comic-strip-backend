@@ -55,10 +55,17 @@ def pick_relative_location(image: Image, head_location, t_width, t_height):
 
 def calculate_text_size(text: str, font):
     lines = text.split("\n")
-    longest_line = max(lines, key=len)
-    bbox = font.getbbox(longest_line)
+
+    # Finding the line that is the widest bbox
+    longest_line_width = 0
+    for line in lines:
+        bbox = font.getbbox(line)
+        longest_line_width = max(longest_line_width, bbox[2] - bbox[0])
+
+
+    bbox = font.getbbox(lines[0])
     single_line_height = bbox[3] - bbox[1]
-    return bbox[2] - bbox[0], (single_line_height + single_line_height / 6) * len(lines)
+    return longest_line_width, (single_line_height + single_line_height / 6) * len(lines)
 
 
 def wrap_text(text: str, max_width=MAX_TEXT_WIDTH):
@@ -328,9 +335,9 @@ if __name__ == "__main__":
 
     guardian = CharacterMoment(Character("Guardian",
                                          "Tall and muscular, with a strong and chiseled jawline. Shiny silver armor with a glowing emblem on the chest.",
-                                         "Brave and selfless"), "punches", "You're going down, villain!")
+                                         "Brave and selfless"), "punches", "Indeed, but remember, it's about understanding.")
     shadow = CharacterMoment(Character("Shadow", "Shiny silver armor, tall and muscular",
-                                       "Cunning and mysterious"), "dodges", "You can't catch me, Guardian!")
+                                       "Cunning and mysterious"), "dodges", "You can't catch me, Guardian! I love passionate understanding")
 
     description = "Standing at city street, Guardian and Shadow face off, ready to fight. Today is the day that the city will be saved, or destroyed."
     frame = Frame(description, [guardian, shadow])

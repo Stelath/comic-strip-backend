@@ -1,9 +1,17 @@
 <start>
-Name: Guardian
-Physical: A tall and muscular figure clad in shining silver armor, with a distinctive golden emblem on their chest.
-Personality: A stoic and determined hero, burdened by the weight of responsibility, and becoming reckless in their pursuit of justice.
+Name: Super Gloves
+Physical: Tall, muscular, short black hair, vibrant blue eyes, strong jawline
+Personality: Determined, optimistic, eager to learn, possesses a strong sense of justice
+Gender: Male
+Race: Hispanic
+Clothing: Tight red and blue suit, with a glowing pair of gloves
+<end>
 
 <start>
-Name: Blitz
-Physical: A sprightly and agile figure, wearing a sleek black and blue suit, adorned with lightning bolt symbols.
-Personality: Loyal and compassionate, always looking out for their friend, Blitz tries to reason with Guardian and maintain their unity against all odds.
+Name: Martin
+Physical: Medium height, slender, bald with a gentle smile, warm brown eyes
+Personality: Wise, kind-hearted, speaks calmly, promotes peace
+Gender: Male
+Race: African American
+Clothing: Simple white linen shirt and trousers, with a peace medallion
+<end>

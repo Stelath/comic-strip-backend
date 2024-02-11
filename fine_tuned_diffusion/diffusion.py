@@ -8,7 +8,7 @@ from PIL import Image
 # headers = {"Authorization": f"Bearer {key}"}
 
 
-API_URL = "https://ga2bbdj4vaekgv6r.us-east-1.aws.endpoints.huggingface.cloud/"
+API_URL = "https://zlie2z38iazjx0cm.us-east-1.aws.endpoints.huggingface.cloud/"
 headers = {
     "Accept" : "image/png",
     "Authorization": "Bearer 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",
@@ -47,3 +47,4 @@ if __name__ == "__main__":
     image = get_image(prompt)
     # Save the image
     image.save("output.png")
+    image.show()
