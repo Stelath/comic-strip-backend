@@ -18,7 +18,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     """Testing"""
-    user_prompt = "A superhero fight MLK in a boxing match."
+    user_prompt = "Young man meets a girl and learns the power of artillery"
     story = ComicBookPrompter(user_prompt)
     print("Story built")
 

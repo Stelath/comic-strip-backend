@@ -150,6 +150,20 @@ class TextBubble:
             if math.sin(angle) == 0:
                 self.loc = (self.loc[0], self.loc[1] + 40)
 
+    def move_onto_screen(self, image):
+        if self.loc[0] < 0:
+            print("Moved bubble from off the left side of the image")
+            self.loc = (0, self.loc[1])
+        if self.loc[0] + self.width > image.size[0]:
+            print("Moved bubble from off the right side of the image")
+            self.loc = (image.size[0] - self.width, self.loc[1])
+        if self.loc[1] < 0:
+            print("Moved bubble from off the top of the image")
+            self.loc = (self.loc[0], 0)
+        if self.loc[1] + self.height > image.size[1]:
+            print("Moved bubble from off the bottom of the image")
+            self.loc = (self.loc[0], image.size[1] - self.height)
+
     def draw(self, image):
         """
         Draws a triangle, then an ellipse, then another triangle to remove part of the border, then the text
@@ -240,7 +254,7 @@ def add_text_bubbles(image: Image, frame):
         dialogue = wrap_text(dialogue, 200)
         text_width, text_height = calculate_text_size(dialogue, font)
 
-        bubble_width = text_width + font_size * 3
+        bubble_width = text_width + font_size * 3 + 40
         bubble_height = text_height + font_size * 3
 
         vals = get_location(image, [physical_description], already_used_locations)
@@ -265,6 +279,13 @@ def add_text_bubbles(image: Image, frame):
             TextBubble(bubble_top_left, bubble_width, bubble_height, head_edge, dialogue, head_location))
 
     """
+        Moving bubbles onto the screen for the first time 
+        This will induce other problems that can be fixed onwards
+        """
+    for text_bubble in text_bubbles:
+        text_bubble.move_onto_screen(image)
+
+    """
     Checking for bubbles covering the faces of other characters that have dialogue bubbles
     """
     for _ in range (2):
@@ -273,9 +294,11 @@ def add_text_bubbles(image: Image, frame):
             for j, face_location in enumerate(all_face_locations):
                 if text_bubble.loc[0] < face_location[0] < text_bubble.loc[0] + text_bubble.width and \
                         text_bubble.loc[1] < face_location[1] < text_bubble.loc[1] + text_bubble.height:
-                    # If the face is covered by a bubble, move the bubble
+                    # If the face is covered by a bubble, move the bubble down and towards the center
                     print("COVERING FACE")
-                    text_bubble.loc = (text_bubble.loc[0], face_location[1] - text_bubble.height - 80)
+                    direction = 1 if text_bubble.loc[0] < image.size[0] / 2 else -1
+                    text_bubble.loc = (text_bubble.loc[0] + 80 * direction, face_location[1] + text_bubble.height + 80)
+
 
 
     """
@@ -288,24 +311,17 @@ def add_text_bubbles(image: Image, frame):
                     text_bubbles[i].loc[1] < text_bubbles[j].loc[1] + text_bubbles[j].height and \
                     text_bubbles[i].loc[1] + text_bubbles[i].height > text_bubbles[j].loc[1]:
                 # If the bubbles overlap, move the second bubble down
-                print("DECONFLICTING")
-                text_bubbles[j].loc = (text_bubbles[j].loc[0], text_bubbles[i].loc[1] + text_bubbles[i].height + 80)
+                print("BUBBLES OVERLAPPING, MOVING ONE DOWN")
+                text_bubbles[j].loc = (text_bubbles[j].loc[0], text_bubbles[i].loc[1] + text_bubbles[i].height)
 
     """
     Moving bubbles so they are entirely on the screen
+    A second time to ensure that the bubbles are entirely on the screen
+    It looks really bad if the bubbles are cut off
     """
     for text_bubble in text_bubbles:
-        if text_bubble.loc[0] < 0:
-            text_bubble.loc = (0, text_bubble.loc[1])
-        if text_bubble.loc[0] + text_bubble.width > image.size[0]:
-            text_bubble.loc = (image.size[0] - text_bubble.width, text_bubble.loc[1])
-        if text_bubble.loc[1] < 0:
-            text_bubble.loc = (text_bubble.loc[0], 0)
-        if text_bubble.loc[1] + text_bubble.height > image.size[1]:
-            text_bubble.loc = (text_bubble.loc[0], image.size[1] - text_bubble.height)
+        text_bubble.move_onto_screen(image)
 
-    # for text_bubble in text_bubbles:
-    #     text_bubble.get_off_of_point_to_loc()
 
     """
     Drawing the bubbles and triangles
@@ -340,8 +356,8 @@ if __name__ == "__main__":
                                        "Cunning and mysterious"), "dodges", "You can't catch me, Guardian! I love passionate understanding")
 
     description = "Standing at city street, Guardian and Shadow face off, ready to fight. Today is the day that the city will be saved, or destroyed."
-    frame = Frame(description, [guardian, shadow])
-    output = add_text_bubbles(Image.open("text_bubble_adder/twoguys.jpg"), frame)
+    frame = Frame(description, [guardian, shadow, guardian, guardian, shadow])
+    output = add_text_bubbles(Image.open("text_bubble_adder/dark-haired-man.jpg"), frame)
     # Save the image
     output.save("output1.jpg")
     # Show the image

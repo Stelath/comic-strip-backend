@@ -9,7 +9,7 @@ import logging
 from multiprocessing import Pool
 
 class ComicBookPrompter:
-    def __init__(self, user_prompt, num_frames=16):
+    def __init__(self, user_prompt, num_frames=3):
         self.user_prompt = user_prompt
         self.num_frames = num_frames
 
