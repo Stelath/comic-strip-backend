@@ -1,8 +1,12 @@
 from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS
 
+from jobs_manager import JobManager
+
 app = Flask(__name__)
 CORS(app)
+
+job_manager = JobManager()
 
 @app.route("/")
 def hello_world():
@@ -15,14 +19,14 @@ def process_prompt():
     print(data)
     prompt = data.get('prompt')
     
-    print(f"Received prompt: {prompt}")
     # Process the prompt (this example just echoes it back)
-    response = f"Received prompt: {prompt}"
+    response = {"receivedPrompt": prompt, "jobId": job_manager.new_job(prompt)}
 
     # Return the response as JSON
-    return jsonify({'response': response})
+    return jsonify(response)
 
 @app.route("/api/jobs/<job_id>", methods=['GET'])
 def get_job_status(job_id):
-    # Replace this with your job status logic
-    return jsonify({'status': 'completed', 'job_id': job_id})
+    info = job_manager.get_job_info(job_id)
+    
+    return jsonify(info)

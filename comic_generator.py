@@ -5,7 +5,6 @@ import os
 import time
 from multiprocessing import Pool
 
-
 def process_prompt(data):
     i, prompt = data
     print(f"Gathering image for frame {i}")
@@ -21,14 +20,18 @@ class ComicGenerator():
         
         self.progress = 0
         self.current_state = "Building Story"
+        
+        self.frames = []
     
     def generate(self):
+        output_dir = os.path.join('generated_comics', self.job_id)
+        
         story = ComicBookPrompter(self.user_prompt)
         self.current_state = "Story built"
         self.progress = 0.2
-
+        
         # Write story to file
-        with open("Full_Backend_Test/story_output.txt", "w") as file:
+        with open(os.path.join(output_dir, 'story_output.txt'), "w") as file:
             file.write(story.__str__())
 
         # Get images for each frame using multiprocessing
@@ -45,11 +48,14 @@ class ComicGenerator():
         
         for i, image in enumerate(frame_images):
             image = add_text_bubbles(image, story.frames[i])
-            image.save(f"generated_comics/{self.job_id}/frame_{i}.png")
-            print(f"Frame {i} saved")
+            image.save(os.path.join(output_dir, f"/frame_{i:03}.png"))
         
         self.current_state = "Text Bubbles Added"
         self.progress = 1.0
-
+        
         self.end_time = time.time()
         self.time_taken = self.end_time - self.start_time
+        self.current_state = "Completed"
+        
+        with open(os.path.join(output_dir, 'full_story.txt'), "w") as file:
+            file.write(str(story))
