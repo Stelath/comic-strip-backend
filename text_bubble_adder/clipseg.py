@@ -6,8 +6,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import os
 
-processor = AutoProcessor.from_pretrained("CIDAS/clipseg-rd64-refined", local_files_only=True)
-model = CLIPSegForImageSegmentation.from_pretrained("CIDAS/clipseg-rd64-refined", local_files_only=True)
+processor = AutoProcessor.from_pretrained("CIDAS/clipseg-rd64-refined", local_files_only=False)
+model = CLIPSegForImageSegmentation.from_pretrained("CIDAS/clipseg-rd64-refined", local_files_only=False)
 
 
 def get_location(image, texts, already_used_locations=None):
