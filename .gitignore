@@ -172,5 +172,10 @@ cython_debug/
 *.gif
 *.txt
 
+frames_output.txt
+outline_output.txt
+characters_output.txt
+
+
 /text_bubble_adder/clipseg-rd64-refined/
 /model/

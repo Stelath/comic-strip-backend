@@ -36,7 +36,7 @@ def get_image(prompt):
             good = True
         except requests.exceptions.HTTPError as err:
             print("Error: " + str(err) + " Prompt: " + prompt)
-            time.sleep(3)
+            time.sleep(5)
 
     image_bytes = response.content
     image = Image.open(io.BytesIO(image_bytes))
