@@ -1,143 +1,38 @@
 <start>
 Frame: 1
-Scene: Peaceville in the morning, sun shining over the colorful buildings, kids playing in the streets.
+Scene: A sunny day at Poppyville's town fair, bustling with people, colorful stalls, and flags fluttering in the breeze.
 <character>
-Name: Super Gloves
-Action: Watching the city from a rooftop, fists on hips.
-Dialogue: "What a beautiful day to promote peace and understanding."
+Name: Tim
+Action: Tim, looking curious and excited, is navigating through the crowd, his eyes wide with anticipation.
+Dialogue: "So much to see! But where's that mysterious exhibit everyone's talking about?"
+<character>
+Name: Bella
+Action: Holding a map and searching the crowd, Bella's eyes are focused and determined.
+Dialogue: "This map says 'The Mighty Thunder' is right around here... Gotta find it!"
 <end>
 
 <start>
 Frame: 2
-Scene: A large digital billboard in Peaceville announces the friendly boxing match.
+Scene: In front of the covered object labeled "The Mighty Thunder," Bella and Tim stand face to face for the first time.
+<character>
+Name: Tim
+Action: Tim looks surprised and intrigued as he accidentally bumps into Bella.
+Dialogue: "Oh! Sorry, didn't see you there... You're looking for 'The Mighty Thunder' too?"
+<character>
+Name: Bella
+Action: Bella, holding the map, looks up at Tim with a mischievous grin.
+Dialogue: "Looks like we have the same quest. Ever heard of teamwork, stranger?"
 <end>
 
 <start>
 Frame: 3
-Scene: Super Gloves, full of excitement, clenches his fist, glowing gloves shimmering.
+Scene: Tim and Bella, now a team, working together to pull the dusty cover off the ancient cannon.
 <character>
-Name: Super Gloves
-Action: Pumping his fist in the air.
-Dialogue: "This is my chance to show Peaceville the strength of peace!"
-<end>
-
-<start>
-Frame: 4
-Scene: Martin, in a quiet room, accepts the challenge with a serene look on his face.
+Name: Tim
+Action: Both hands on the cover, Tim pulls with excitement, his eyes sparkling with curiosity.
+Dialogue: "On three...One, two, three!"
 <character>
-Name: Martin
-Action: Nodding gently with a smile.
-Dialogue: "May this match enlighten hearts about the true strength."
-<end>
-
-<start>
-Frame: 5
-Scene: Super Gloves training vigorously, punching a heavy bag with his glowing gloves.
-<character>
-Name: Super Gloves
-Action: Sweating as he throws a powerful punch.
-Dialogue: "I've got to be ready!"
-<end>
-
-<start>
-Frame: 6
-Scene: Martin sitting in a peaceful garden, reading a book about non-violence, surrounded by nature.
-<character>
-Name: Martin
-Action: Reading, immersed in the book.
-Dialogue: "Strength lies not in fists, but in words and understanding."
-<end>
-
-<start>
-Frame: 7
-Scene: Peaceville Arena brimming with citizens, buzzing with excitement and anticipation, awaiting the match.
-<end>
-
-<start>
-Frame: 8
-Scene: Super Gloves and Martin face each other in the ring, surrounded by cheering crowds.
-<character>
-Name: Super Gloves
-Action: Raising his glowing fists, ready to fight.
-Dialogue: "Let's make this a match to remember!"
-<character>
-Name: Martin
-Action: Standing calmly with hands behind his back.
-Dialogue: "Indeed, but remember, it's about understanding."
-<end>
-
-<start>
-Frame: 9
-Scene: Super Gloves throwing a powerful punch towards Martin.
-<character>
-Name: Super Gloves
-Action: Full of determination, throwing the punch.
-Dialogue: ""
-<end>
-
-<start>
-Frame: 10
-Scene: Martin standing firm, unafraid, as the punch comes close.
-<character>
-Name: Martin
-Action: Bracing silently, not intending to retaliate.
-Dialogue: ""
-<end>
-
-<start>
-Frame: 11
-Scene: The crowd gasps as Martin begins to speak, despite the looming punch.
-<character>
-Name: Martin
-Action: Speaking calmly, a gentle aura around him.
-Dialogue: "True strength comes from our heart, not our hands."
-<end>
-
-<start>
-Frame: 12
-Scene: Super Gloves' punch slows mid-air, confusion and curiosity in his eyes.
-<character>
-Name: Super Gloves
-Action: Hesitating, his punch loses force.
-Dialogue: "What...?"
-<end>
-
-<start>
-Frame: 13
-Scene: Martin gently holding Super Gloves' fist, stopping it with ease.
-<character>
-Name: Martin
-Action: Holding the fist, a peaceful smile on his face.
-Dialogue: "Listen, my friend. Let's talk about peace."
-<end>
-
-<start>
-Frame: 14
-Scene: Super Gloves lowers his fists, now intrigued by Martin's words.
-<character>
-Name: Super Gloves
-Action: Lowering his hands, beginning to listen.
-Dialogue: "I'm listening..."
-<end>
-
-<start>
-Frame: 15
-Scene: Martin begins to weave a narrative about peace, love, and understanding, the crowd silent and attentive.
-<character>
-Name: Martin
-Action: Speaking passionately, captivating everyone.
-Dialogue: "Strength is in our ability to understand and love."
-<end>
-
-<start>
-Frame: 16
-Scene: Super Gloves and Martin, talking earnestly in the ring, surrounded by a now quiet and reflective crowd.
-<character>
-Name: Super Gloves
-Action: Nodding, fully engaged in the conversation.
-Dialogue: "Perhaps, there's more to strength than I realized."
-<character>
-Name: Martin
-Action: Narrating with hand gestures, a soft smile on his face.
-Dialogue: "Let this day be our first step towards true understanding."
+Name: Bella
+Action: Bella pulls alongside Tim, her face lit up with the thrill of discovery.
+Dialogue: "Let's unveil history!"
 <end>

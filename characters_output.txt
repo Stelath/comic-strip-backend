@@ -1,17 +1,35 @@
 <start>
-Name: Super Gloves
-Physical: Tall, muscular, short black hair, vibrant blue eyes, strong jawline
-Personality: Determined, optimistic, eager to learn, possesses a strong sense of justice
+Name: Tim 
+Physical: Short, curly brown hair with green eyes, lean build.
+Personality: Curious, intelligent, easily excited.
 Gender: Male
-Race: Hispanic
-Clothing: Tight red and blue suit, with a glowing pair of gloves
+Race: Caucasian
+Clothing: Beige overalls, white T-shirt, blue sneakers.
 <end>
 
 <start>
-Name: Martin
-Physical: Medium height, slender, bald with a gentle smile, warm brown eyes
-Personality: Wise, kind-hearted, speaks calmly, promotes peace
+Name: Bella
+Physical: Bright red hair, adventurous sparkle in eyes, freckles.
+Personality: Fearless, determined, inventive.
+Gender: Female
+Race: Latina
+Clothing: Denim jeans, black tank top, red bandana.
+<end>
+
+<start>
+Name: Mr. Hanzo
+Physical: Elderly, tall, slender with long white beard.
+Personality: Wise, secretive, warmly eccentric.
 Gender: Male
-Race: African American
-Clothing: Simple white linen shirt and trousers, with a peace medallion
+Race: Asian
+Clothing: Ancient-looking robes with mysterious symbols.
+<end>
+
+<start>
+Name: Zara
+Physical: Dark skin, short afro hair, piercing brown eyes.
+Personality: Resourceful, spirited, supportive.
+Gender: Female
+Race: African
+Clothing: Yellow sundress, large hoop earrings, sandals.
 <end>
