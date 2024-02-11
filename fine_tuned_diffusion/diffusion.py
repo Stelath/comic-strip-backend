@@ -1,10 +1,20 @@
 import requests
 import io
+import time
 from PIL import Image
 
-API_URL = "https://api-inference.huggingface.co/models/Stelath/textual_inversion_comic_strip_fp16"
-key = open("huggingface_diffusion/hf_key", "r")
-headers = {"Authorization": f"Bearer {key}"}
+# API_URL = "https://api-inference.huggingface.co/models/Stelath/textual_inversion_comic_strip_test"
+# key = open("huggingface_diffusion/hf_key", "r").read()
+# headers = {"Authorization": f"Bearer {key}"}
+
+
+API_URL = "https://ga2bbdj4vaekgv6r.us-east-1.aws.endpoints.huggingface.cloud/"
+headers = {
+    "Accept" : "image/png",
+    "Authorization": "Bearer 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",
+    "Content-Type": "application/json"
+}
+
 
 
 def get_image(prompt):
@@ -13,8 +23,10 @@ def get_image(prompt):
     :param prompt: A string
     :return: A PIL Image
     """
+    print("Using Alex's Diffusion model")
     payload = {
-        "inputs": prompt,
+        "inputs": prompt + ", in the style of <comic-strip>",
+        "negative_prompt": "text bubble, black and white, low saturation, blurry, low res, photorealistic, low contrast"
     }
     good = False
     while not good:
@@ -23,15 +35,15 @@ def get_image(prompt):
             response.raise_for_status()  # What does this line do?  -> This line raises an HTTPError if the HTTP request returned an unsuccessful status code.
             good = True
         except requests.exceptions.HTTPError as err:
-            print("Error: " + str(err))
+            print("Error: " + str(err) + " Prompt: " + prompt)
+            time.sleep(3)
 
     image_bytes = response.content
     image = Image.open(io.BytesIO(image_bytes))
     return image
 
-
 if __name__ == "__main__":
-    prompt = "A super hero and their sidekick fight each other"
+    prompt = "strawberry on a beach"
     image = get_image(prompt)
     # Save the image
     image.save("output.png")

@@ -222,6 +222,7 @@ def add_text_bubbles(image: Image, frame):
     print(f"adding text bubbles to {len(character_moments)} characters)")
 
     text_bubbles = []
+    already_used_locations = []
     for character_moment in character_moments:
         physical_description = character_moment.physical_description
         dialogue = character_moment.dialogue
@@ -235,9 +236,10 @@ def add_text_bubbles(image: Image, frame):
         bubble_width = text_width + font_size * 3
         bubble_height = text_height + font_size * 3
 
-        vals = get_location(image, [physical_description])
+        vals = get_location(image, [physical_description], already_used_locations)
         head_location = (vals[0], vals[1])
         logits = vals[2]
+        already_used_locations.append(head_location)
 
         head_edge = find_head_edge(image, head_location, logits)
         bubble_top_left = pick_relative_location(image, head_location, bubble_width, bubble_height)
@@ -327,13 +329,13 @@ if __name__ == "__main__":
     guardian = CharacterMoment(Character("Guardian",
                                          "Tall and muscular, with a strong and chiseled jawline. Shiny silver armor with a glowing emblem on the chest.",
                                          "Brave and selfless"), "punches", "You're going down, villain!")
-    shadow = CharacterMoment(Character("Shadow", "Wearing green",
+    shadow = CharacterMoment(Character("Shadow", "Shiny silver armor, tall and muscular",
                                        "Cunning and mysterious"), "dodges", "You can't catch me, Guardian!")
 
-    description = "A top a skyscraper, Guardian and Shadow face off, there is a storm in the background and the battle is" + \
-                  " intense. The city is visible below, and the sun is setting. Today is the day that the fate of the city" + \
-                  " will be decided."
+    description = "Standing at city street, Guardian and Shadow face off, ready to fight. Today is the day that the city will be saved, or destroyed."
     frame = Frame(description, [guardian, shadow])
     output = add_text_bubbles(Image.open("text_bubble_adder/twoguys.jpg"), frame)
     # Save the image
     output.save("output1.jpg")
+    # Show the image
+    output.show()

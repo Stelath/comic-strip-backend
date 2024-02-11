@@ -1,4 +1,5 @@
 # Load model directly
+import torch
 from transformers import AutoProcessor, CLIPSegForImageSegmentation
 import torch.nn.functional as F
 from PIL import Image
@@ -9,13 +10,15 @@ processor = AutoProcessor.from_pretrained("CIDAS/clipseg-rd64-refined", local_fi
 model = CLIPSegForImageSegmentation.from_pretrained("CIDAS/clipseg-rd64-refined", local_files_only=True)
 
 
-def get_location(image, texts):
+def get_location(image, texts, already_used_locations=None):
     """
     Given an image and a list of texts, find the location of the text in the image
     :param image: A PIL image
     :param texts: A list of strings
     :return: A tuple of (x, y) coordinates
     """
+    if already_used_locations is None:
+        already_used_locations = []
     texts.append("Human Head")
     # Preprocess image
     inputs = processor(text=texts,
@@ -45,12 +48,39 @@ def get_location(image, texts):
     y = y * scale_y
 
     # Scale the logits so they can be used for edge detection
-    # Scale the logits so they can be used for edge detection
     logits = combined_logits.unsqueeze(0).unsqueeze(0)  # Add batch size and channel dimensions
     scaled_logits = F.interpolate(logits, size=(image.height, image.width), mode='bilinear', align_corners=False)
+    scaled_logits = scaled_logits.squeeze(0).squeeze(0)
+
+    # If that location is close to one already used, then reduce all those nearby values by 1/2 their magnitude
+    for location in already_used_locations:
+        # Calculate distance to the already used location
+        print("New location:", x, y)
+        print("Already used location:", location)
+        distance = ((location[1] - y) ** 2 + (location[0] - x) ** 2) ** 0.5
+        print("Distance to already used:", distance)
+        if distance < 200:
+            print("Close to already used")
+            # Generate a mask roughly the size of the head
+            mask = torch.zeros_like(scaled_logits)
+            mask_size = 100
+            miny = int(max(0, y - mask_size))
+            maxy = int(min(image.height, y + mask_size))
+            minx = int(max(0, x - mask_size))
+            maxx = int(min(image.width, x + mask_size))
+            mask[miny:maxy, minx:maxx] = 1
+            mask = mask * 0.5
+            scaled_logits = scaled_logits - mask
+
+            # Select the new maximum value
+            max_index = scaled_logits.view(-1).argmax()
+            y, x = divmod(max_index.item(), scaled_logits.shape[1])
+
+
+
     # Render the logits
-    plt.imshow(scaled_logits.squeeze(0).squeeze(0).detach().numpy())
-    # plt.show()
+    plt.imshow(scaled_logits.detach().numpy())
+    plt.show()
 
     scaled_logits = scaled_logits.squeeze(0).squeeze(0)
     return x, y, scaled_logits

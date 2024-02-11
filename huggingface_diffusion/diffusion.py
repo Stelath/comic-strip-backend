@@ -3,7 +3,7 @@ import io
 from PIL import Image
 
 API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
-key = open("huggingface_diffusion/hf_key", "r")
+key = open("huggingface_diffusion/hf_key", "r").read().strip()
 headers = {"Authorization": f"Bearer {key}"}
 
 

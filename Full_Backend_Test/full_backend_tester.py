@@ -9,14 +9,16 @@ from multiprocessing import Pool
 def process_prompt(data):
     i, prompt = data
     print(f"Gathering image for frame {i}")
-    return get_image(prompt)
+    image = get_image(prompt)
+    print(f"Image for frame {i} gathered")
+    return image
 
 
 if __name__ == "__main__":
     start_time = time.time()
 
     """Testing"""
-    user_prompt = "A small town teenager discovers that he has the power to kill anyone by taking a picture of them. He struggles with the moral implications of his power and the responsibility that comes with it."
+    user_prompt = "A superhero fight MLK in a boxing match."
     story = ComicBookPrompter(user_prompt)
     print("Story built")
 
