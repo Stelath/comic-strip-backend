@@ -9,7 +9,7 @@ $CHARACTER_DESCRIPTIONS
 Each frame must be similar to the style of a Marvel superhero comic book.
 The frame info provided will be used later in a diffusion model to generate a comic book.
 
-Each frame should progress the story, none should bring the story to a conclusion.
+Each frame should progress the story slowly, not quickly. Do not finish the story in the frames provided.
 The story must be left open-ended, so more frames can be added later.
 Every character that appears must be from the list of characters provided.
 If there are no characters in a frame, then don't include the <character> tag.

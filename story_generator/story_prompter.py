@@ -9,8 +9,9 @@ import logging
 from multiprocessing import Pool
 
 class ComicBookPrompter:
-    def __init__(self, user_prompt):
+    def __init__(self, user_prompt, num_frames=12):
         self.user_prompt = user_prompt
+        self.num_frames = num_frames
 
         try:
             # Load api key from key.txt
@@ -150,6 +151,8 @@ class ComicBookPrompter:
                     physical_description = line[8:] + " " + physical_description
                 elif "Race:" in line:
                     physical_description = line[6:] + " " + physical_description
+                elif "Clothing:" in line:
+                    physical_description = physical_description + " wearing a " + line[10:]
 
             if name and physical_description and personality:
                 characters.append(Character(name, physical_description, personality))
@@ -168,12 +171,11 @@ class ComicBookPrompter:
 
         Provides ChatGPT with the general outline and characters, and asks for 4 to 6 frames for the comic book
         """
-        num_frames = random.randint(10, 20)
         prompt = None
         with open('story_generator/prompts/get_frames_prompt.txt', 'r') as file:
             prompt = file.read()
 
-        prompt = prompt.replace("$FRAME_COUNT", str(num_frames))
+        prompt = prompt.replace("$FRAME_COUNT", str(self.num_frames))
         prompt = prompt.replace("$OUTLINE", self.outline)
 
         # Building a string which holds the info of all characters
