@@ -35,6 +35,7 @@ class JobManager:
             "currentState": job.current_state,
             "progress": job.progress,
             "prompt": job.user_prompt,
+            "title": job.story_title,
             "frames": job.frames,
         }
         

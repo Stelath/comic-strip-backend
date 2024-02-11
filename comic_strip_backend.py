@@ -21,7 +21,7 @@ def process_prompt():
     prompt = data.get('prompt')
     
     # Process the prompt (this example just echoes it back)
-    response = {"receivedPrompt": prompt, "jobId": job_manager.new_job(prompt)}
+    response = {"receivedPrompt": prompt, "jobID": job_manager.new_job(prompt)}
 
     # Return the response as JSON
     return jsonify(response)

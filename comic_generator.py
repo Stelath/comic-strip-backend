@@ -24,6 +24,7 @@ class ComicGenerator():
         self.progress = 0
         self.current_state = "Building Story"
         
+        self.story_title = ""
         self.frames = []
     
     def generate(self):
@@ -32,6 +33,7 @@ class ComicGenerator():
         os.makedirs(os.path.join(output_dir, 'frames'), exist_ok=True)
         
         story = ComicBookPrompter(self.user_prompt, num_frames=8)
+        self.story_title = story.title
         self.current_state = "Story built"
         self.progress = 0.2
         
