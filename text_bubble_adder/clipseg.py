@@ -79,7 +79,7 @@ def get_location(image, texts, already_used_locations=None):
 
 
     # Render the logits
-    plt.imshow(scaled_logits.detach().numpy())
+    # plt.imshow(scaled_logits.detach().numpy())
     # plt.show()
 
     scaled_logits = scaled_logits.squeeze(0).squeeze(0)

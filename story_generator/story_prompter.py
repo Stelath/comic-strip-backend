@@ -80,8 +80,8 @@ class ComicBookPrompter:
             {"role": "user", "content": prompt}
         ]
         output = self.ask_chat_gpt(messages)
-        with open("outline_output.txt", "w") as file:
-            file.write(output)
+        # with open("outline_output.txt", "w") as file:
+        #     file.write(output)
         return output
 
     def gen_title(self):
@@ -95,8 +95,8 @@ class ComicBookPrompter:
             {"role": "user", "content": prompt}
         ]
         output = self.ask_chat_gpt(messages)
-        with open("title_output.txt", "w") as file:
-            file.write(output)
+        # with open("title_output.txt", "w") as file:
+        #     file.write(output)
 
         for line in output.split("\n"):
             if "Title:" in line:
@@ -124,8 +124,8 @@ class ComicBookPrompter:
         ]
 
         output = self.ask_chat_gpt(messages)
-        with open("characters_output.txt", "w") as file:
-            file.write(output)
+        # with open("characters_output.txt", "w") as file:
+        #     file.write(output)
 
         """
         Parsing the output to get a list of individual characters
@@ -193,8 +193,8 @@ class ComicBookPrompter:
         output = self.ask_chat_gpt(messages)
         print("\n\nOutput: \n\n", output)
 
-        with open("frames_output.txt", "w") as file:
-            file.write(output)
+        # with open("frames_output.txt", "w") as file:
+        #     file.write(output)
 
         frames = []
         frame_text_sections = output.split("<start>")[1:]
