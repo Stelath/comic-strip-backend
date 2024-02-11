@@ -1,5 +1,5 @@
 from story_generator.story_prompter import ComicBookPrompter
-from huggingface_diffusion.diffusion import get_image
+from fine_tuned_diffusion.diffusion import get_image
 
 import os
 import time

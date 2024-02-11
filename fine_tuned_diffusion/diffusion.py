@@ -2,7 +2,7 @@ import requests
 import io
 from PIL import Image
 
-API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+API_URL = "https://api-inference.huggingface.co/models/Stelath/textual_inversion_comic_strip_fp16"
 key = open("huggingface_diffusion/hf_key", "r")
 headers = {"Authorization": f"Bearer {key}"}
 
